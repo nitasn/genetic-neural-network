@@ -15,19 +15,19 @@ CXXFLAGS := -std=c++20 -Wall -Ofast -MMD -MP -I./$(SRC_DIR)
 #################################################################
 
 
-PHONY_TARGETS := all run time clean help
+PHONY_TARGETS := executable run time clean help
 
 .PHONY: $(PHONY_TARGETS)
 
-all: $(EXECUTABLE)
+executable: $(EXECUTABLE)
 
 args := # can be passed from command line, e.g. make run args="one two three"
 
-run: all
+run: executable
 	@echo "running $(EXECUTABLE) $(args)"
 	@$(EXECUTABLE) $(args)
 
-time: all
+time: executable
 	@echo "timing $(EXECUTABLE) $(args)"
 	@time $(EXECUTABLE) $(args)
 
@@ -36,11 +36,11 @@ clean:
 
 help:
 	@echo "Available targets:"
-	@echo "  all   - Build the executable."
-	@echo "  run   - Run the executable."
-	@echo "  time  - Time the executable."
-	@echo "  clean - Remove all build files."
-	@echo "  help  - Show this help message."
+	@echo "  executable  - Build the executable."
+	@echo "  run         - Run the executable."
+	@echo "  time        - Time the executable."
+	@echo "  clean       - Remove all build files."
+	@echo "  help        - Show this help message."
 
 
 #################################################################
