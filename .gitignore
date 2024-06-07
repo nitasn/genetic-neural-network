@@ -1,4 +1,2 @@
 **/.DS_Store
-executable
-.vscode
-executable.dSYM/
+build
