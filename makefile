@@ -7,7 +7,8 @@ DEP_DIR := $(OUT_DIR)/.d
 EXECUTABLE := $(OUT_DIR)/main
 
 CXX := clang
-CXXFLAGS := -std=c++20 -Wall -Ofast -MMD -MP -I./$(SRC_DIR)
+CXXFLAGS := -std=c++20 -Wall -Ofast -MMD -MP -I./$(SRC_DIR) -arch arm64
+LDFLAGS += -lstdc++
 
 
 #################################################################
@@ -32,7 +33,7 @@ time: executable
 	@time $(EXECUTABLE) $(args)
 
 clean:
-	rm -rf $(OBJ_DIR) $(DEP_DIR) $(EXECUTABLE)
+	rm -rf $(OUT_DIR)
 
 help:
 	@echo "Available targets:"
@@ -58,7 +59,7 @@ DEP_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(DEP_DIR)/%.d,$(SRC_FILES))
 $(EXECUTABLE): $(OBJ_FILES)
 	@mkdir -p $(OUT_DIR)
 	@echo "linking $@"
-	@$(CXX) $(CXXFLAGS) -o $@ $^
+	@$(CXX) $(LDFLAGS) -o $@ $^
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@) $(dir $(DEP_DIR)/$*.d)
