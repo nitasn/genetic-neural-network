@@ -36,14 +36,16 @@ constexpr size_t InputSize = 4, OutputSize = 2;
 class NeuronalNetwork {
 private:
   std::vector<Neuron> neurons;
-  // the first InputSize neurons will always be the inputs (in their original order),
-  // and the last OutputSize neurons will always be the outputs (in their original order).
-  // splicing may only happen at neurons[InputSize: -OutputSize].
+  // neurons[: InputSize] are the inputs (in their original order),
+  // neurons[InputSize: InputSize + OutputSize] are the outputs (in their original order),
+  // neurons[InputSize + OutputSize: ] are new neurons.
+
+  size_t numLinks;
 
   std::vector<size_t> neuronsTopologicalOrder;
 
 public:
-  NeuronalNetwork() {
+  NeuronalNetwork() : numLinks(InputSize * OutputSize) {
     neurons.reserve(InputSize + OutputSize);
     neuronsTopologicalOrder.reserve(InputSize + OutputSize);
 
@@ -68,6 +70,10 @@ public:
     for (size_t i = 0; i < InputSize; i++) {
       neurons[i].value = input[i];
     }
+
+    for (size_t i = InputSize; i < neurons.size(); i++) {
+      neurons[i].value = 0;
+    }
     
     for (size_t idx : neuronsTopologicalOrder) {
       Neuron& neuron = neurons[idx];
@@ -79,14 +85,14 @@ public:
     }
 
     std::array<double, OutputSize> output;
-    for (size_t i = 0; i < OutputSize; i++) {
-      output[i] = neurons[neurons.size() - OutputSize + i].value;
+    for (size_t out = 0; out < OutputSize; out++) {
+      output[out] = neurons[InputSize + out].value;
     }
     return output;
   }
 
   void addNeuron() {
-    
+
   }
 
   void addLinks() {
@@ -97,15 +103,35 @@ public:
 
   void mutateLinks() {
     std::vector<Link*> links;
+    links.reserve(numLinks);
 
     for (size_t idx = 0; idx < neurons.size() - OutputSize; idx++) {
-      Neuron& neuron = neurons[idx];
-      for (Link& link : neuron.outGoingLinks) {
+      for (Link& link : neurons[idx].outGoingLinks) {
         links.push_back(&link);
       }
     }
 
-    size_t randIdx = randomIndex(links.size());
+    size_t randIdx = randomIndex(numLinks);
     links[randIdx]->weight += randomNormal() * 0.1;
   }
 };
+
+/**
+ * Numbers represent topological order.
+ * 
+ *   0   1   2   3
+ *   |   |\  |  /
+ *   |   | \ | /
+ *   |   |  \|/
+ *   4   |   5
+ *    \  |  /|
+ *     \ | / |
+ *      \|/  |
+ *       6   |
+ *        \  |
+ *         \ |
+ *          \|
+ *           7
+ * 
+ * 
+ */
