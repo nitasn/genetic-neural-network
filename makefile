@@ -6,7 +6,7 @@ DEP_DIR := $(OUT_DIR)/.d
 
 EXECUTABLE := $(OUT_DIR)/main
 
-CXX := g++
+CXX := clang
 CXXFLAGS := -std=c++20 -Wall -Ofast -MMD -MP -I./$(SRC_DIR)
 
 
