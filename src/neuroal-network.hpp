@@ -18,71 +18,106 @@ double sigmoid(double x) {
 struct Neuron {
   double bias;
   double accum;
-  int distFromInput;
 };
 
 struct Link {
-  int from;
-  int to;
+  size_t from;
+  size_t to;
   double weight;
 };
 
 
-constexpr int InputSize = 4, OutputSize = 2;
-// template <int InputSize, int OutputSize>
+constexpr size_t InputSize = 4, OutputSize = 2;
+// template <size_t InputSize, size_t OutputSize>
 
 class NeuronalNetwork {
 private:
-  std::vector<Neuron> neurons; // size: HiddenSize + OutputSize (WITHOUT InputSize)
+
+  /**
+   * Size = HiddenSize + OutputSize (WITHOUT InputSize)
+   */
+  std::vector<Neuron> neurons;
+
+  /**
+   * Links are in topological order.
+   * Indices of neurons are shifted by InputSize.
+   */
   std::vector<Link> links;
+
+  /**
+   * Example Network State
+   * 
+   *   0   1   2   3
+   *   |   |\  |  /
+   *   |   | \ | /
+   *   |   |  \|/
+   *   7   |   5
+   *    \  |  /|
+   *     \ | / |
+   *      \|/  |
+   *       6   |
+   *        \  |
+   *         \ |
+   *          \|
+   *           4
+   * 
+   * InputSize = 4
+   * OutputSize = 1
+   * 
+   * Links History
+   * [ (0, 4), (1, 4), (2, 4), (3, 4) ]  / Add neuron #5
+   * [ (0, 4), (1, 4), (2, 4), (3, 4) ]  /
+   */
 
 public:
   NeuronalNetwork() {
     neurons.reserve(OutputSize);
 
-    for (int j = 0; j < OutputSize; j++) {
-      neurons.push_back(Neuron { .bias = randomBetweenMinusOneAndPlusOne(), .distFromInput = 1 });
+    for (size_t j = 0; j < OutputSize; j++) {
+      neurons.push_back(Neuron { .bias = randomBetweenMinusOneAndPlusOne() });
     }
     
     links.reserve(InputSize * OutputSize);
 
-    for (int i = 0; i < InputSize; i++) {
-      for (int j = 0; j < OutputSize; j++) {
-        links.emplace_back(Link { .from = i, .to = j, .weight = randomBetweenMinusOneAndPlusOne() });
+    for (size_t out = 0; out < OutputSize; out++) {
+      for (size_t in = 0; in < InputSize; in++) {
+        links.push_back(Link { .from = in, .to = InputSize + out, .weight = randomBetweenMinusOneAndPlusOne() });
       }
     }
   }
 
-  std::array<double, OutputSize> forward(std::span<double, InputSize> input) {
+  // std::array<double, OutputSize> forward(std::span<double, InputSize> input) {
 
-  }
+  // }
 
   void addNeuron() {
+    size_t newNeuronIdx = neurons.size();
+    neurons.push_back(Neuron { .bias = randomBetweenMinusOneAndPlusOne() });
+
+    size_t linkIdx = randomIndex(links.size());
+    Link newLink = { .from = newNeuronIdx, .to = links[linkIdx].to, .weight = links[linkIdx].weight };
+
+    links[linkIdx].to = newNeuronIdx;
+    links.insert(links.begin() + linkIdx + 1, newLink);
+  }
+
+  void addLink() {
 
   }
 };
 
-/*
-
-topological order of node indices: [1, 2, 3, 4, 5, 6, 7]
-
-1   2   3   4
-|   |\  |  /
-|   | \ | /
-|   |  \|/
-X   |   5
- \  |  /|
-  \ | / |
-   \|/  |
-    6   |
-     \  |
-      \ |
-       \|
-        7
-
-we want to insert node X on the link (1, 6)
-X could be spliced before either 5 or 6, i.e. [1, 2, 3, 4, X, 5, 6, 7] or [1, 2, 3, 4, 5, X, 6, 7]
-because dist(6, input) == dist(5, input)
-and hence a future link could be either (5, 6) or (6, 5) depending on where we choose to splice X.
-
-*/
+/**
+ *   0   1   2   3
+ *   |   |\  |  /
+ *   |   | \ | /
+ *   |   |  \|/
+ *   7   |   5
+ *    \  |  /|
+ *     \ | / |
+ *      \|/  |
+ *       6   |
+ *        \  |
+ *         \ |
+ *          \|
+ *           4
+ */
