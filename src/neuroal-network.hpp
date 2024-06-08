@@ -125,12 +125,16 @@ public:
     auto* cachedLink = randomLink();
     auto [oldFrom, oldTo] = *cachedLink;
 
-    Link& oldLink = findIf(neurons[oldFrom], [=](Link& link) { return link.toIndex == oldTo; });
+    auto oldLink = std::find_if(
+      neurons[oldFrom].outGoingLinks.begin(), 
+      neurons[oldFrom].outGoingLinks.end(),
+      [=](Link& link) { return link.toIndex == oldTo; }
+    );
 
-    newOne.outGoingLinks.push_back(Link { .weight = oldLink.weight, .toIndex = oldLink.toIndex });
-    oldLink.toIndex = neurons.size();
+    newOne.outGoingLinks.push_back(Link { .weight = oldLink->weight, .toIndex = oldLink->toIndex });
+    oldLink->toIndex = neurons.size();
 
-    auto neuronPos = indexOf(neuronsTopologicalOrder, oldLink.toIndex);
+    auto neuronPos = indexOf(neuronsTopologicalOrder, oldLink->toIndex);
     neuronsTopologicalOrder.insert(neuronPos, neurons.size());
 
     cachedLink->second = neurons.size();
@@ -166,8 +170,13 @@ public:
     auto* cachedLink = randomLink();
     auto [oldFrom, oldTo] = *cachedLink;
 
-    Link& oldLink = findIf(neurons[oldFrom], [=](Link& link) { return link.toIndex == oldTo; });
-    oldLink.weight += randomNormal() * 0.1;
+    auto oldLink = std::find_if(
+      neurons[oldFrom].outGoingLinks.begin(), 
+      neurons[oldFrom].outGoingLinks.end(),
+      [=](Link& link) { return link.toIndex == oldTo; }
+    );
+    
+    oldLink->weight += randomNormal() * 0.1;
   }
 
   void applyRandomMutation() {
