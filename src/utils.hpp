@@ -25,6 +25,10 @@ void printArrayLike(const ArrayLike& input) {
 
 #define debug(expression) print("debug:", #expression, "==", (expression))
 
-inline auto indexOf(auto& vec, auto& x) {
+inline auto indexOf(const auto& vec, const auto& x) {
   return std::find(vec.begin(), vec.end(), x);
+}
+
+inline auto findIf(const auto& vec, const auto& predicate) {
+  return std::find_if(vec.begin(), vec.end(), predicate);
 }

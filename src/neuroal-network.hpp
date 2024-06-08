@@ -63,26 +63,18 @@ private:
    *           7
    */
 
-  size_t numLinks;
+  std::vector<std::pair<size_t, size_t>> cachedLinks;
 
-  Link* randomLink() {
-    std::vector<Link*> links;
-    links.reserve(numLinks);
-
-    for (Neuron& neuron : neurons) {
-      for (Link& link : neuron.outGoingLinks) {
-        links.push_back(&link);
-      }
-    }
-
-    size_t randIdx = randomIndex(numLinks);
-    return links[randIdx];
+  std::pair<size_t, size_t>* randomLink() {
+    size_t randIdx = randomIndex(cachedLinks.size());
+    return &cachedLinks[randIdx];
   }
 
 public:
-  NeuronalNetwork() : numLinks(InputSize * OutputSize) {
+  NeuronalNetwork() {
     neurons.reserve(InputSize + OutputSize);
     neuronsTopologicalOrder.reserve(InputSize + OutputSize);
+    cachedLinks.reserve(InputSize * OutputSize);
 
     for (size_t in = 0; in < InputSize; in++) {
       neurons.push_back(Neuron{ .bias = randomSigned(), .activation = identity });
@@ -97,6 +89,7 @@ public:
     for (size_t in = 0; in < InputSize; in++) {
       for (size_t out = 0; out < OutputSize; out++) {
         neurons[in].outGoingLinks.push_back(Link { .toIndex = InputSize + out, .weight = randomSigned() });
+        cachedLinks.push_back({ in, InputSize + out });
       }
     }
   }
@@ -128,13 +121,22 @@ public:
 
   void addRandomNeuron() {
     Neuron newOne = { .bias = randomSigned(), .activation = relu };
-    Link* oldLink = randomLink();
-    newOne.outGoingLinks.push_back(Link { .weight = oldLink->weight, .toIndex = oldLink->toIndex });
-    oldLink->toIndex = neurons.size();
-    auto neuronPos = indexOf(neuronsTopologicalOrder, oldLink->toIndex);
+
+    auto* cachedLink = randomLink();
+    auto [oldFrom, oldTo] = *cachedLink;
+
+    Link& oldLink = findIf(neurons[oldFrom], [=](Link& link) { return link.toIndex == oldTo; });
+
+    newOne.outGoingLinks.push_back(Link { .weight = oldLink.weight, .toIndex = oldLink.toIndex });
+    oldLink.toIndex = neurons.size();
+
+    auto neuronPos = indexOf(neuronsTopologicalOrder, oldLink.toIndex);
     neuronsTopologicalOrder.insert(neuronPos, neurons.size());
+
+    cachedLink->second = neurons.size();
+    cachedLinks.push_back({ neurons.size(), oldTo });
+
     neurons.push_back(newOne);
-    numLinks++;
   }
 
   void addRandomLink() {
@@ -152,7 +154,7 @@ public:
     size_t to = neuronsTopologicalOrder[toTopo];
 
     neurons[from].outGoingLinks.push_back(Link { .toIndex = to, .weight = randomSigned() });
-    numLinks++;
+    cachedLinks.push_back({ from, to });
   }
 
   void mutateRandomNeuron() {
@@ -161,7 +163,11 @@ public:
   }
 
   void mutateRandomLink() {
-    randomLink()->weight += randomNormal() * 0.1;
+    auto* cachedLink = randomLink();
+    auto [oldFrom, oldTo] = *cachedLink;
+
+    Link& oldLink = findIf(neurons[oldFrom], [=](Link& link) { return link.toIndex == oldTo; });
+    oldLink.weight += randomNormal() * 0.1;
   }
 
   void applyRandomMutation() {
