@@ -7,21 +7,8 @@ int main() {
   std::array<double, 4> input = { 0.1, -0.2, 0.3, -0.4 };
   printArrayLike(nn.forward(input));
 
-  nn.mutateLinks();
-  printArrayLike(nn.forward(input));
-
-  nn.mutateLinks();
-  printArrayLike(nn.forward(input));
-
-  nn.mutateLinks();
-  printArrayLike(nn.forward(input));
-
-  nn.mutateLinks();
-  printArrayLike(nn.forward(input));
-
-  nn.mutateLinks();
-  printArrayLike(nn.forward(input));
-
-  nn.mutateLinks();
-  printArrayLike(nn.forward(input));
+  for (size_t i = 0; i < 1000; i++) {
+    nn.applyRandomMutation();
+    printArrayLike(nn.forward(input));
+  }
 }

@@ -24,3 +24,7 @@ void printArrayLike(const ArrayLike& input) {
 }
 
 #define debug(expression) print("debug:", #expression, "==", (expression))
+
+inline auto indexOf(auto& vec, auto& x) {
+  return std::find(vec.begin(), vec.end(), x);
+}
