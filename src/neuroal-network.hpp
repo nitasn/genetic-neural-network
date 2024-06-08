@@ -7,6 +7,7 @@
 
 #include "random.hpp"
 
+
 double relu(double x) {
   return std::max(0.0, x);
 }
@@ -19,6 +20,7 @@ double identity(double x) {
   return x;
 }
 
+
 struct Link {
   size_t toIndex;
   double weight;
@@ -30,9 +32,9 @@ struct Neuron {
   std::vector<Link> outGoingLinks;
 };
 
-constexpr size_t InputSize = 4, OutputSize = 2;
-// template <size_t InputSize, size_t OutputSize>
 
+// constexpr size_t InputSize = 4, OutputSize = 2;
+template <size_t InputSize, size_t OutputSize>
 class NeuronalNetwork {
 private:
   std::vector<Neuron> neurons;
@@ -46,21 +48,21 @@ private:
   // the first InputSize elements are inputs, and the last OutputSize elements are the outputs.
 
   /**
-   * Numbers represent topological order.
+   * Numbers represent neurons in topological order.
    * 
    *   0   1   2   3
    *   |   |\  |  /
    *   |   | \ | /
    *   |   |  \|/
    *   4   |   5
-   *    \  |  /|
-   *     \ | / |
-   *      \|/  |
-   *       6   |
-   *        \  |
-   *         \ |
-   *          \|
-   *           7
+   *    \  |  /|\
+   *     \ | / | \
+   *      \|/  |  \
+   *       6   7   )
+   *        \  |  /
+   *         \ | /
+   *          \|/
+   *           8
    */
 
   std::vector<std::pair<size_t, size_t>> cachedLinks;
@@ -126,7 +128,7 @@ public:
     auto [oldFrom, oldTo] = *cachedLink;
 
     auto oldLink = std::find_if(
-      neurons[oldFrom].outGoingLinks.begin(), 
+      neurons[oldFrom].outGoingLinks.begin(),
       neurons[oldFrom].outGoingLinks.end(),
       [=](Link& link) { return link.toIndex == oldTo; }
     );
@@ -171,7 +173,7 @@ public:
     auto [oldFrom, oldTo] = *cachedLink;
 
     auto oldLink = std::find_if(
-      neurons[oldFrom].outGoingLinks.begin(), 
+      neurons[oldFrom].outGoingLinks.begin(),
       neurons[oldFrom].outGoingLinks.end(),
       [=](Link& link) { return link.toIndex == oldTo; }
     );
@@ -180,11 +182,15 @@ public:
   }
 
   void applyRandomMutation() {
-    switch (randomIndex(4)) {
-      case 0: return addRandomLink();
-      case 1: return addRandomNeuron();
-      case 2: return mutateRandomLink();
-      case 3: return mutateRandomNeuron();
-    }
+    static constexpr std::array<double, 4> weights = { 0.3, 0.1, 0.4, 0.2 };
+    static constexpr std::array<double, 4> thresholds = cumsum(weights);
+
+    double random = randomUniform();
+
+    return
+      random < thresholds[0] ? addRandomLink() :
+      random < thresholds[1] ? addRandomNeuron() :
+      random < thresholds[2] ? mutateRandomLink() : 
+                               mutateRandomNeuron() ;
   }
 };
