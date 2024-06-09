@@ -95,4 +95,11 @@ public:
 
     population = nextGeneration;
   }
+
+  /**
+   * Should be called after having invoking `advanceOneGeneration` at least once.
+  */
+  NN populationBest() {
+    return population[0];
+  }
 };
