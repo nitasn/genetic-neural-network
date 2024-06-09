@@ -14,8 +14,8 @@ void print(const T& first, const Rest&... rest) {
   print(rest...);
 }
 
-template <typename ArrayLike>
-void printArrayLike(const ArrayLike& input) {
+template<std::ranges::range ArrLike>
+void printArrayLike(const ArrLike& input) {
   std::cout << "[ ";
   for (size_t i = 0; i < input.size();) {
     std::cout << input[i];
@@ -44,4 +44,19 @@ constexpr ArrLike cumsum(const ArrLike& input) {
   }
 
   return result;
+}
+
+template<std::ranges::range ArrLike>
+bool arraysEqual(const ArrLike& A, const ArrLike& B) {
+  if (A.size() != B.size()) {
+    throw std::invalid_argument("size mismatch");
+  }
+
+  for (size_t i = 0; i < A.size(); i++) {
+    if (A[i] != B[i]) {
+      return false;
+    }
+  }
+
+  return true;
 }

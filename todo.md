@@ -1,0 +1,1 @@
+1. parallelize fitness function across population

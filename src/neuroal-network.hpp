@@ -33,10 +33,28 @@ struct Neuron {
 };
 
 
+/**
+ * Numbers represent neurons in topological order.
+ * 
+ *   0   1   2   3
+ *   |   |\  |  /
+ *   |   | \ | /
+ *   |   |  \|/
+ *   4   |   5
+ *    \  |  /|\
+ *     \ | / | \
+ *      \|/  |  \
+ *       6   7   )
+ *        \  |  /
+ *         \ | /
+ *          \|/
+ *           8
+ */
+
 // constexpr size_t InputSize = 4, OutputSize = 2;
 template <size_t InputSize, size_t OutputSize>
 class NeuronalNetwork {
-private:
+public:
   std::vector<Neuron> neurons;
   // new neurons appended at the end, i.e. 
   // neurons[: InputSize] are the inputs (in their original order),
@@ -46,24 +64,6 @@ private:
   std::vector<size_t> neuronsTopologicalOrder;
   // in neuronsTopologicalOrder, 
   // the first InputSize elements are inputs, and the last OutputSize elements are the outputs.
-
-  /**
-   * Numbers represent neurons in topological order.
-   * 
-   *   0   1   2   3
-   *   |   |\  |  /
-   *   |   | \ | /
-   *   |   |  \|/
-   *   4   |   5
-   *    \  |  /|\
-   *     \ | / | \
-   *      \|/  |  \
-   *       6   7   )
-   *        \  |  /
-   *         \ | /
-   *          \|/
-   *           8
-   */
 
   std::vector<std::pair<size_t, size_t>> cachedLinks;
 
@@ -95,6 +95,12 @@ public:
       }
     }
   }
+
+  // Copy constructor (deep copying)
+  NeuronalNetwork(const NeuronalNetwork& other)
+    : neurons(other.neurons),
+      neuronsTopologicalOrder(other.neuronsTopologicalOrder),
+      cachedLinks(other.cachedLinks) { }
 
   std::array<double, OutputSize> forward(std::span<double, InputSize> input) {
     for (size_t i = 0; i < InputSize; i++) {
@@ -182,8 +188,8 @@ public:
   }
 
   void applyRandomMutation() {
-    static constexpr std::array<double, 4> weights = { 0.3, 0.1, 0.4, 0.2 };
-    static constexpr std::array<double, 4> thresholds = cumsum(weights);
+    constexpr std::array<double, 4> weights = { 0.3, 0.1, 0.4, 0.2 };
+    constexpr std::array<double, 4> thresholds = cumsum(weights);
 
     double random = randomUniform();
 
