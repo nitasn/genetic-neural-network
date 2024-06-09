@@ -30,13 +30,13 @@ private:
 
 public:
   const int PopulationSize;
-  const int ElitismSize;
+  const int EliteSize;
 
-  Tournament(int popSize, double elitismRatio, FitnessFunction fitnessFn) 
+  Tournament(int popSize, double eliteRatio, FitnessFunction fitnessFn) 
     : population(popSize),
       fitnessFn(fitnessFn),
       PopulationSize(popSize),
-      ElitismSize(std::ceil(elitismRatio * popSize)) { }
+      EliteSize(std::ceil(eliteRatio * popSize)) { }
   
   void advanceOneGeneration() {
     std::vector<std::pair<size_t, double>> idxAndScore;
@@ -62,7 +62,8 @@ public:
     std::vector<NN> nextGeneration;
     nextGeneration.reserve(PopulationSize);
 
-    for (size_t i = 0; i < ElitismSize; i++) {
+    // add elite to next generation
+    for (size_t i = 0; i < EliteSize; i++) {
       size_t idx = idxAndScore[i].first;
       nextGeneration.push_back(population[idx]);
     }
@@ -75,7 +76,7 @@ public:
     std::vector<double> cumsumWeights;
     cumsumWeights.reserve(PopulationSize);
 
-    cumsumWeights[0] = idxAndScore[0].second / total_scores;
+    cumsumWeights.push_back(idxAndScore[0].second / total_scores);
     for (size_t i = 1; i < PopulationSize; i++) {
       double normalizedScore = idxAndScore[i].second / total_scores;
       cumsumWeights.push_back(cumsumWeights[i - 1] + normalizedScore);

@@ -10,7 +10,7 @@ double fitness(NeuronalNetwork<4, 2>& nn) {
 }
 
 int main() {
-  Tournament tour(15, 0.30, fitness);
+  Tournament tour(9, 0.30, fitness);
   for (size_t i = 0; i < 100; i++) {
     tour.advanceOneGeneration();
   }
