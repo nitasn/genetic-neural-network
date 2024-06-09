@@ -1,3 +1,5 @@
+#pragma once
+
 #include <span>
 #include <numeric>  // for std::partial_sum
 #include <concepts> // for std::ranges::range

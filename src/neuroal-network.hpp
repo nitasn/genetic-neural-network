@@ -54,7 +54,7 @@ struct Neuron {
 // constexpr size_t InputSize = 4, OutputSize = 2;
 template <size_t InputSize, size_t OutputSize>
 class NeuronalNetwork {
-public:
+private:
   std::vector<Neuron> neurons;
   // new neurons appended at the end, i.e. 
   // neurons[: InputSize] are the inputs (in their original order),
@@ -101,6 +101,16 @@ public:
     : neurons(other.neurons),
       neuronsTopologicalOrder(other.neuronsTopologicalOrder),
       cachedLinks(other.cachedLinks) { }
+
+  // Move assignment operator
+  NeuronalNetwork& operator=(NeuronalNetwork&& other) noexcept {
+    if (this != &other) {
+      neurons = std::move(other.neurons);
+      neuronsTopologicalOrder = std::move(other.neuronsTopologicalOrder);
+      cachedLinks = std::move(other.cachedLinks);
+    }
+    return *this;
+  }
 
   std::array<double, OutputSize> forward(std::span<double, InputSize> input) {
     for (size_t i = 0; i < InputSize; i++) {
