@@ -165,7 +165,7 @@ public:
       [=](Link& link) { return link.toIndex == oldTo; }
     );
 
-    newOne.outGoingLinks.push_back(Link { .weight = oldLink->weight, .toIndex = oldLink->toIndex });
+    newOne.outGoingLinks.push_back(Link { .toIndex = oldLink->toIndex, .weight = oldLink->weight });
     oldLink->toIndex = neurons.size();
 
     auto neuronPos = indexOf(neuronsTopologicalOrder, oldLink->toIndex);

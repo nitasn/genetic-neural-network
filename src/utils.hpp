@@ -1,7 +1,7 @@
 #pragma once
 
 #include <span>
-#include <numeric>  // for std::partial_sum
+#include <vector>
 #include <concepts> // for std::ranges::range
 #include <iostream>
 

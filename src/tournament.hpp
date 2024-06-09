@@ -29,8 +29,8 @@ private:
   }
 
 public:
-  const int PopulationSize;
-  const int EliteSize;
+  const size_t PopulationSize;
+  const size_t EliteSize;
 
   Tournament(int popSize, double eliteRatio, FitnessFunction fitnessFn) 
     : population(popSize),
