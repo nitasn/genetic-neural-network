@@ -7,7 +7,7 @@ DEP_DIR := $(OUT_DIR)/.d
 EXECUTABLE := $(OUT_DIR)/main
 
 CXX := clang
-CXXFLAGS := -std=c++20 -Wall -Ofast -g -MMD -MP -I./$(SRC_DIR) -arch arm64
+CXXFLAGS := -std=c++20 -Wall -O2 -g -MMD -MP -I./$(SRC_DIR) -arch arm64
 LDFLAGS += -lstdc++
 
 

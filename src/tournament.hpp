@@ -6,17 +6,18 @@
 
 constexpr double NaN = std::numeric_limits<double>::quiet_NaN();
 
-constexpr size_t InputSize = 4, OutputSize = 2;
-
-typedef NeuronalNetwork<InputSize, OutputSize> NN;
-
-/**
- * fitness must be strictly positive!
- * todo: or it it? (vsauce music)
- */
-using FitnessFunction = double (*)(NeuronalNetwork<InputSize, OutputSize>&);
+// constexpr size_t InputSize = 4, OutputSize = 2;
+template <size_t InputSize, size_t OutputSize>
 
 class Tournament {
+  using NN = NeuronalNetwork<InputSize, OutputSize>;
+
+  /**
+   * Fitness must be strictly positive!
+   * If your values might be negative, wrap the thing with `exp()`.
+   */
+  using FitnessFunction = double (*)(NeuronalNetwork<InputSize, OutputSize>&);
+
 private:
   std::vector<NN> population;
   FitnessFunction fitnessFn;
@@ -57,7 +58,7 @@ public:
       return a.second > b.second;
     });
 
-    logGenerationFitness(idxAndScore);
+    // logGenerationFitness(idxAndScore);
 
     std::vector<NN> nextGeneration;
     nextGeneration.reserve(PopulationSize);
