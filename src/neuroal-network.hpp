@@ -96,11 +96,17 @@ public:
     }
   }
 
-  // Copy constructor (deep copying)
+  // Copy constructor (deep copy)
   NeuronalNetwork(const NeuronalNetwork& other)
     : neurons(other.neurons),
       neuronsTopologicalOrder(other.neuronsTopologicalOrder),
       cachedLinks(other.cachedLinks) { }
+
+  // Move Constructor
+  NeuronalNetwork(NeuronalNetwork&& other) noexcept
+    : neurons(std::move(other.neurons)),
+      neuronsTopologicalOrder(std::move(other.neuronsTopologicalOrder)),
+      cachedLinks(std::move(other.cachedLinks)) { }
 
   // Move assignment operator
   NeuronalNetwork& operator=(NeuronalNetwork&& other) noexcept {
@@ -108,6 +114,16 @@ public:
       neurons = std::move(other.neurons);
       neuronsTopologicalOrder = std::move(other.neuronsTopologicalOrder);
       cachedLinks = std::move(other.cachedLinks);
+    }
+    return *this;
+  }
+
+  // Copy assignment operator (deep copy)
+  NeuronalNetwork& operator=(const NeuronalNetwork& other) {
+    if (this != &other) {
+      neurons = other.neurons;
+      neuronsTopologicalOrder = other.neuronsTopologicalOrder;
+      cachedLinks = other.cachedLinks;
     }
     return *this;
   }

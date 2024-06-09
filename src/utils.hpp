@@ -62,3 +62,11 @@ bool arraysEqual(const ArrLike& A, const ArrLike& B) {
 
   return true;
 }
+
+template <typename T, typename R, typename MapFn>
+std::vector<R> mapVector(const std::vector<T>& vec, MapFn mapFn) {
+  std::vector<R> results;
+  results.reserve(vec.size());
+  std::transform(vec.begin(), vec.end(), std::back_inserter(results), mapFn);
+  return results;
+}
